@@ -1,15 +1,17 @@
 [green_agent]
 agentbeats_id = "019bba35-9cbc-7950-a8da-41c06010d6bf"
-env = { LLM_API_KEY = "${LLM_API_KEY}", DATASET="/app/data/public.csv", YOUR_NAME="ai noobs", EMAIL_ADDRESS="ai.noobs.2025@gmail.com", LOCAL_LLM_MODEL_PATH="/app/tools/models/llama-3.2-1b-instruct-q4_k_m.gguf" }
+env = { LLM_API_KEY = "${LLM_API_KEY}", LLM_MODEL = "openai/gpt-4o-mini", USE_LOCAL_LLM_JUDGE = "0", DATASET = "/app/data/public.csv", NUM_TASKS_OVERRIDE = "50", YOUR_NAME = "onejumpinc", EMAIL_ADDRESS = "business@mail.onejumpinc.com", LOCAL_LLM_MODEL_PATH = "/app/tools/models/llama-3.2-1b-instruct-q4_k_m.gguf" }
 
 [[participants]]
-agentbeats_id = "019bba61-5125-7dc2-97ab-ed46f4acbd9d"
+agentbeats_id = "01a05b80-58e6-7e71-95e9-656bde816e85"
+image = "ghcr.io/onejumpinc/officeqa-proxy-agent@sha256:7a6d2d64b9a582b0a57460d13ecb5ef4641afdac8d71d864007c2ce7380ce8fa"
 name = "finance-purple-agent"
-env = {LLM_API_KEY = "${LLM_API_KEY}"}
+env = { OFFICEQA_API_URL = "${OFFICEQA_API_URL}", OFFICEQA_API_TOKEN = "${OFFICEQA_API_TOKEN}" }
 
 [config]
 # Add your assessment config here
 method = "run_assessment"
-args = { 
-    num_tasks = 1,
-    white_address = "http://finance-purple-agent:9009"}  # <-- point to the purple agent container
+
+[config.args]
+num_tasks = 50
+white_address = "http://finance-purple-agent:9009"
