@@ -1,6 +1,6 @@
 [green_agent]
 agentbeats_id = "019bba35-9cbc-7950-a8da-41c06010d6bf"
-env = { LLM_API_KEY = "${LLM_API_KEY}", LLM_MODEL = "openai/gpt-4o-mini", USE_LOCAL_LLM_JUDGE = "0", DATASET = "/app/data/public.csv", NUM_TASKS_OVERRIDE = "50", YOUR_NAME = "onejumpinc", EMAIL_ADDRESS = "business@mail.onejumpinc.com", LOCAL_LLM_MODEL_PATH = "/app/tools/models/llama-3.2-1b-instruct-q4_k_m.gguf" }
+env = { USE_LOCAL_LLM_JUDGE = "1", USE_LOCAL_LLM_GPU = "0", LOCAL_LLM_JUDGE_MODEL = "/app/tools/models/llama-3.2-1b-instruct-q4_k_m.gguf", DATASET = "/app/data/public.csv", YOUR_NAME = "onejumpinc", EMAIL_ADDRESS = "business@mail.onejumpinc.com" }
 
 [[participants]]
 agentbeats_id = "01a05b80-58e6-7e71-95e9-656bde816e85"

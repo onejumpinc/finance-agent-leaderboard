@@ -46,13 +46,11 @@ jobs:
 
       - name: Export secrets as environment variables
         env:
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           OFFICEQA_API_URL: ${{ secrets.OFFICEQA_API_URL }}
           OFFICEQA_API_TOKEN: ${{ secrets.OFFICEQA_API_TOKEN }}
         run: |
           umask 077
           printf '%s\n' \
-            "LLM_API_KEY=$LLM_API_KEY" \
             "OFFICEQA_API_URL=$OFFICEQA_API_URL" \
             "OFFICEQA_API_TOKEN=$OFFICEQA_API_TOKEN" > .env
 
@@ -93,22 +91,35 @@ jobs:
           git checkout -b ${{ steps.metadata.outputs.branch_name }} upstream/main
 
       - name: Commit results
+        env:
+          GH_TOKEN: ${{ secrets.SUBMISSION_TOKEN }}
         run: |
+          test -n "$GH_TOKEN"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add submissions/${{ steps.metadata.outputs.unique_name }}.toml submissions/${{ steps.metadata.outputs.unique_name }}.provenance.json results/${{ steps.metadata.outputs.unique_name }}.json
           git commit -m "Submission: ${{ steps.metadata.outputs.unique_name }}
 
           Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          git config --local --unset-all http.https://github.com/.extraheader || true
+          gh auth setup-git
           git push origin ${{ steps.metadata.outputs.branch_name }}
           echo "::notice title=Submission Branch Created::Your results are ready for submission on branch: ${{ steps.metadata.outputs.branch_name }}"
 
-      - name: Output PR link
+      - name: Create pull request
+        id: pull_request
+        env:
+          GH_TOKEN: ${{ secrets.SUBMISSION_TOKEN }}
         run: |
+          PR_URL=$(gh pr create \
+            --repo "${{ steps.target.outputs.repo }}" \
+            --base main \
+            --head "${{ github.repository_owner }}:${{ steps.metadata.outputs.branch_name }}" \
+            --title "Submission: ${{ steps.metadata.outputs.unique_name }}" \
+            --body "FinanceBusters public 50-question assessment from workflow run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
+          echo "url=$PR_URL" >> "$GITHUB_OUTPUT"
           echo "### Submit your results" >> $GITHUB_STEP_SUMMARY
-          echo "[Click here to open a pull request](https://github.com/${{ steps.target.outputs.repo }}/compare/main...${{ github.repository_owner }}:${{ github.event.repository.name }}:${{ steps.metadata.outputs.branch_name }}?expand=1)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "⚠️ When creating the PR, UNCHECK 'Allow edits and access to secrets by maintainers' to protect your secrets." >> $GITHUB_STEP_SUMMARY
+          echo "[Open pull request]($PR_URL)" >> $GITHUB_STEP_SUMMARY
 
       - name: Cleanup
         if: always()

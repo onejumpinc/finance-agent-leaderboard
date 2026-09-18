@@ -82,6 +82,8 @@ services:
     volumes:
       - ./a2a-scenario.toml:/app/scenario.toml
       - ./output:/app/output
+      - ./finance_client.py:/runner/finance_client.py:ro
+    entrypoint: ["uv", "run", "/runner/finance_client.py"]
     command: ["scenario.toml", "output/results.json"]
     depends_on:{client_depends}
     networks:
