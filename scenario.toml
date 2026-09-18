@@ -9,7 +9,7 @@ name = "finance-purple-agent"
 env = { OFFICEQA_API_URL = "${OFFICEQA_API_URL}", OFFICEQA_API_TOKEN = "${OFFICEQA_API_TOKEN}" }
 
 [config]
-# Add your assessment config here
+# Full 50-question public assessment; changing this file triggers the runner.
 method = "run_assessment"
 
 [config.args]
