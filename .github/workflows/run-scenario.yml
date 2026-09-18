@@ -46,28 +46,15 @@ jobs:
 
       - name: Export secrets as environment variables
         env:
-          SECRETS_JSON: ${{ toJSON(secrets) }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          OFFICEQA_API_URL: ${{ secrets.OFFICEQA_API_URL }}
+          OFFICEQA_API_TOKEN: ${{ secrets.OFFICEQA_API_TOKEN }}
         run: |
-          echo "$SECRETS_JSON" | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' > .env
-
-      - name: Check if GHCR_TOKEN is available
-        id: check_ghcr
-        env:
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-        run: |
-          if [ -n "$GHCR_TOKEN" ]; then
-            echo "has_token=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_token=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Login to GitHub Container Registry
-        if: steps.check_ghcr.outputs.has_token == 'true'
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          umask 077
+          printf '%s\n' \
+            "LLM_API_KEY=$LLM_API_KEY" \
+            "OFFICEQA_API_URL=$OFFICEQA_API_URL" \
+            "OFFICEQA_API_TOKEN=$OFFICEQA_API_TOKEN" > .env
 
       - name: Run assessment
         run: docker compose up --timestamps --no-color --exit-code-from agentbeats-client --abort-on-container-exit
