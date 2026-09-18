@@ -1,6 +1,7 @@
 name: Run Scenario
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'scenario.toml'
